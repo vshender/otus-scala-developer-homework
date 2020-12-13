@@ -1,6 +1,6 @@
 package ru.otus.jdbc
 
-object Test extends App {
+object TestTest extends App {
 
     println("Test")
 }

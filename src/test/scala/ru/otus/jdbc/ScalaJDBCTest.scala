@@ -2,19 +2,18 @@ package ru.otus.jdbc
 
 import java.sql.DriverManager
 
-import org.scalatest.freespec.AnyFreeSpec
+class ScalaJDBCTest extends PgTestContainer {
 
-class ScalaJDBCTest extends AnyFreeSpec with PgEmbedded {
 
-  "test" in {
 
-    val connection = DriverManager.getConnection(url)
 
-    val name  = "ivan"
+  "test example of PrepareStatement in ScalaJDBC" in {
+    Class.forName(container.driverClassName)
+
+    val connection = DriverManager.getConnection(container.jdbcUrl, container.username, container.password)
+
+    val name = "ivan"
     val passw = "123123"
-
-//    connection.createStatement.execute(s"select * from USERS")
-//    connection.createStatement.execute(s"select * from USERS")
 
     val statement = connection
       .prepareStatement(
@@ -26,8 +25,15 @@ class ScalaJDBCTest extends AnyFreeSpec with PgEmbedded {
 
     val set = statement.executeQuery()
 
-    val array = set.getArray("NAME")
+    set.next()
 
+    val resultName = set.getString(1)
+    val resultPassword = set.getString(2)
+
+    assert(name == resultName)
+    assert(passw == resultPassword)
+
+    set.close()
 
     connection.close()
   }
