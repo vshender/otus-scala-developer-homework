@@ -2,7 +2,7 @@ name := "otus-scala-developer-homework"
 
 version := "0.1"
 
-scalaVersion := "2.12.7"
+scalaVersion := "2.13.4"
 
 
 libraryDependencies ++= Seq(
@@ -11,5 +11,7 @@ libraryDependencies ++= Seq(
     "org.scalikejdbc"         %% "scalikejdbc"                    % "3.5.0"   % Test,
     "org.scalikejdbc"         %% "scalikejdbc-test"               % "3.5.0"   % Test,
     "com.dimafeng"           %% "testcontainers-scala-postgresql"   % "0.38.7"  % Test,
-    "com.dimafeng" %% "testcontainers-scala-scalatest"   % "0.38.7"  % Test
+    "com.dimafeng"              %% "testcontainers-scala-scalatest"   % "0.38.7"  % Test,
+    "com.typesafe.slick"        %% "slick" % "3.3.3" % Test
+
 )
