@@ -10,21 +10,22 @@ class PgTestContainer extends AnyFreeSpec with ForAllTestContainer with BeforeAn
 
   override val container = PostgreSQLContainer()
 
-  var schema: String = _
-
+  val schema = "otus"
 
   override def afterStart(): Unit = {
     Class.forName(container.driverClassName)
 
     val connection = DriverManager.getConnection(container.jdbcUrl, container.username, container.password)
 
-    val name = "ivan"
-    val passw = "123123"
+    connection.createStatement.execute(s"create schema if not exists $schema;" )
+    connection.createStatement.execute(s"drop table if exists USERS;")
+    connection.createStatement.execute(s"create table USERS (NAME text, PASSW text);")
+    connection.createStatement.execute(s"insert into USERS values ('ivan', '123123');")
+    connection.createStatement.execute(s"insert into USERS values ('ivan', '999999');")
+    connection.createStatement.execute(s"insert into USERS values ('jack', '777777');")
 
-    connection.createStatement.execute(s"""create schema "$schema" """)
-    connection.createStatement.execute(s"""drop table if exists USERS;""")
-    connection.createStatement.execute(s"""create table USERS (NAME text, PASSW text);""")
-    connection.createStatement.execute(s"""insert into USERS values ('ivan', '123123');""")
+//    connection.createStatement.execute(s"create table USERS (NAME text);")
+//    connection.createStatement.execute(s"insert into USERS values ('ivan');")
 
     connection.close()
   }
@@ -35,7 +36,7 @@ class PgTestContainer extends AnyFreeSpec with ForAllTestContainer with BeforeAn
 
     val connection = DriverManager.getConnection(container.jdbcUrl, container.username, container.password)
 
-    connection.createStatement.execute(s"""drop schema "$schema" cascade """)
+    connection.createStatement.execute(s"drop schema if exists $schema cascade;")
 
     connection.close()
   }

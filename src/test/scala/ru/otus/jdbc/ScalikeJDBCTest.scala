@@ -3,10 +3,9 @@ package ru.otus.jdbc
 import scalikejdbc._
 
 
-class ScalikeJDBC  extends PgTestContainer {
+class ScalikeJDBCTest  extends PgTestContainer {
 
   "test interpolation" in {
-
     Class.forName(container.driverClassName)
 
     ConnectionPool.singleton(container.jdbcUrl, container.username, container.password)
@@ -15,6 +14,7 @@ class ScalikeJDBC  extends PgTestContainer {
     val passw = "123123"
 
     case class Person(name: String, passw: String)
+//    case class Person1(name: String)
 
     val userNames = DB readOnly { implicit session =>
       sql"select NAME, PASSW from USERS where NAME = $name and PASSW = $passw"
@@ -30,48 +30,41 @@ class ScalikeJDBC  extends PgTestContainer {
   }
 
 
-  case class Person(name: String, passw: Option[String])
+  case class Person(name: String, passw: String)
+//  case class Person1(name: String, passw: String)
 
   object Person extends SQLSyntaxSupport[Person] {
     override val tableName = "USERS"
     def apply(a: SyntaxProvider[Person])(rs: WrappedResultSet): Person = apply(a.resultName)(rs)
-    def apply(a: ResultName[Person])(rs: WrappedResultSet): Person = new Person(rs.string(a.name), rs.stringOpt(a.passw))
-    def opt(a: SyntaxProvider[Person])(rs: WrappedResultSet): Option[Person] = rs.stringOpt(a.resultName.name).map(_ => apply(a)(rs))
+    def apply(a: ResultName[Person])(rs: WrappedResultSet): Person = new Person(
+      name = rs.string(a.name),
+      passw = rs.string(a.passw))
   }
 
-  "test Querry DSL" in {
+  "test Query DSL" in {
     Class.forName(container.driverClassName)
 
     ConnectionPool.singleton(container.jdbcUrl, container.username, container.password)
 
-//    DB autoCommit {
-//      implicit s =>
-//        try sql"drop table if not exists ${Person.table}".execute.apply()
-//        catch { case e: Exception => }
-//        sql"create table ${Person.table} (name varchar(256) not null, passw varchar(256))".execute.apply()
-//
-//    }
-
 
     DB localTx { implicit  s =>
-//      val p = Person.column
-//
-//        applyUpdate(
-//          insert
-//            .into(Person).columns(p.name, p.passw)
-//            .values("ivan", "123123")
-//        )
-
       val pp = Person.syntax("p")
 
       val ivan: Person = withSQL(
         select
           .from(Person as pp)
-          .where.eq(pp.name, "ivan")
-      ).map(Person(pp)).single.apply().get
+          .where
+          .withRoundBracket {
+            _.eq(pp.name,"ivan")
+              .and
+              .eq(pp.passw, "123123")
+          }
+      )
+//      .map(Person1(pp)).single.apply().get
+          .map(Person(pp)).single.apply().get
 
       assert(ivan.name == "ivan")
-      assert(ivan.passw.get == "123123")
+      assert(ivan.passw == "123123")
     }
   }
 }
