@@ -1,4 +1,4 @@
-package ru.otus.jdbc
+package ru.otus.jdbc.overview
 
 import scalikejdbc._
 

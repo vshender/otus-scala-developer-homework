@@ -1,6 +1,6 @@
-package ru.otus.jdbc
+package ru.otus.jdbc.overview
 
-import slick.jdbc.H2Profile.api._
+import slick.jdbc.PostgresProfile.api._
 import slick.jdbc.JdbcBackend.Database
 
 import scala.concurrent.Await
