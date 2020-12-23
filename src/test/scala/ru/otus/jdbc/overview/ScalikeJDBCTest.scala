@@ -44,27 +44,5 @@ class ScalikeJDBCTest  extends PgTestContainer {
   "test Query DSL" in {
     Class.forName(container.driverClassName)
 
-    ConnectionPool.singleton(container.jdbcUrl, container.username, container.password)
-
-
-    DB localTx { implicit  s =>
-      val pp = Person.syntax("p")
-
-      val ivan: Person = withSQL(
-        select
-          .from(Person as pp)
-          .where
-          .withRoundBracket {
-            _.eq(pp.name,"ivan")
-              .and
-              .eq(pp.passw, "123123")
-          }
-      )
-//      .map(Person1(pp)).single.apply().get
-          .map(Person(pp)).single.apply().get
-
-      assert(ivan.name == "ivan")
-      assert(ivan.passw == "123123")
-    }
   }
 }
