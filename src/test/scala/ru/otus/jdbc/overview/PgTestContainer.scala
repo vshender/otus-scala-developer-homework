@@ -7,7 +7,6 @@ import org.scalatest.freespec.AnyFreeSpec
 import java.sql.DriverManager
 
 class PgTestContainer extends AnyFreeSpec with ForAllTestContainer with BeforeAndAfter {
-
   override val container = PostgreSQLContainer()
 
   val schema = "otus"
@@ -17,12 +16,12 @@ class PgTestContainer extends AnyFreeSpec with ForAllTestContainer with BeforeAn
 
     val connection = DriverManager.getConnection(container.jdbcUrl, container.username, container.password)
 
-    connection.createStatement.execute(s"create schema if not exists $schema;" )
-    connection.createStatement.execute(s"drop table if exists USERS;")
-    connection.createStatement.execute(s"create table USERS (NAME text, PASSW text);")
-    connection.createStatement.execute(s"insert into USERS values ('ivan', '123123');")
-    connection.createStatement.execute(s"insert into USERS values ('ivan', '999999');")
-    connection.createStatement.execute(s"insert into USERS values ('jack', '777777');")
+    connection.createStatement.execute(s"CREATE SCHEMA IF NOT EXISTS $schema;" )
+    connection.createStatement.execute("DROP TABLE IF EXISTS users;")
+    connection.createStatement.execute("CREATE TABLE users(name text, passwd text);")
+    connection.createStatement.execute("INSERT INTO users VALUES('ivan', '123123');")
+    connection.createStatement.execute("INSERT INTO users VALUES('ivan', '999999');")
+    connection.createStatement.execute("INSERT INTO users VALUES('jack', '777777');")
 
 //    connection.createStatement.execute(s"create table USERS (NAME text);")
 //    connection.createStatement.execute(s"insert into USERS values ('ivan');")
@@ -30,13 +29,12 @@ class PgTestContainer extends AnyFreeSpec with ForAllTestContainer with BeforeAn
     connection.close()
   }
 
-
   override def beforeStop(): Unit = {
     super.beforeStop()
 
     val connection = DriverManager.getConnection(container.jdbcUrl, container.username, container.password)
 
-    connection.createStatement.execute(s"drop schema if exists $schema cascade;")
+    connection.createStatement.execute(s"DROP SCHEMA IF EXISTS $schema CASCADE;")
 
     connection.close()
   }

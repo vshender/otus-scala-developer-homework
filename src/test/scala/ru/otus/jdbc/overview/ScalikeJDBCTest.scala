@@ -2,47 +2,41 @@ package ru.otus.jdbc.overview
 
 import scalikejdbc._
 
-
 class ScalikeJDBCTest  extends PgTestContainer {
-
   "test interpolation" in {
     Class.forName(container.driverClassName)
 
+    case class Person(name: String, passwd: String)
+
+    val name = "ivan"
+    val passwd = "123123"
+
     ConnectionPool.singleton(container.jdbcUrl, container.username, container.password)
 
-    val name  = "ivan"
-    val passw = "123123"
-
-    case class Person(name: String, passw: String)
-    case class Person1(name: String)
-
     val userNames = DB readOnly { implicit session =>
-      sql"select NAME, PASSW from USERS where NAME = $name and PASSW = $passw"
+      sql"SELECT name, passwd FROM users WHERE name = $name AND passwd = $passwd"
         .map(rs =>
           Person(
-            name = rs.string("NAME"),
-            passw = rs.string("PASSW")
+            name = rs.string("name"),
+            passwd = rs.string("passwd")
           )).list.apply()
     }
 
     assert(userNames.head.name == "ivan")
-    assert(userNames.head.passw == "123123")
-  }
-
-
-  case class Person(name: String, passw: String)
-//  case class Person1(name: String, passw: String)
-
-  object Person extends SQLSyntaxSupport[Person] {
-    override val tableName = "USERS"
-    def apply(a: SyntaxProvider[Person])(rs: WrappedResultSet): Person = apply(a.resultName)(rs)
-    def apply(a: ResultName[Person])(rs: WrappedResultSet): Person = new Person(
-      name = rs.string(a.name),
-      passw = rs.string(a.passw))
+    assert(userNames.head.passwd == "123123")
   }
 
   "test Query DSL" in {
     Class.forName(container.driverClassName)
+
+    case class Person(name: String, passwd: String)
+    object Person extends SQLSyntaxSupport[Person] {
+      override val tableName = "USERS"
+      def apply(a: SyntaxProvider[Person])(rs: WrappedResultSet): Person = apply(a.resultName)(rs)
+      def apply(a: ResultName[Person])(rs: WrappedResultSet): Person = new Person(
+        name = rs.string(a.name),
+        passwd = rs.string(a.passwd))
+    }
 
     ConnectionPool.singleton(container.jdbcUrl, container.username, container.password)
 
@@ -56,14 +50,13 @@ class ScalikeJDBCTest  extends PgTestContainer {
           .withRoundBracket {
             _.eq(pp.name, "ivan")
               .and
-              .eq(pp.passw, "123123")
+              .eq(pp.passwd, "123123")
           }
       )
-        //      .map(Person1(pp)).single.apply().get
         .map(Person(pp)).single.apply().get
 
       assert(ivan.name == "ivan")
-      assert(ivan.passw == "123123")
+      assert(ivan.passwd == "123123")
     }
   }
 }
