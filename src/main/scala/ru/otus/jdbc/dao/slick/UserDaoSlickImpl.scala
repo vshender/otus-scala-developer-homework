@@ -1,7 +1,5 @@
 package ru.otus.jdbc.dao.slick
 
-
-
 import ru.otus.jdbc.model.{Role, User}
 import slick.dbio.Effect
 import slick.jdbc.PostgresProfile.api._
@@ -9,9 +7,6 @@ import slick.sql.FixedSqlAction
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
-
-
-
 
 class UserDaoSlickImpl(db: Database)(implicit ec: ExecutionContext) {
   import UserDaoSlickImpl._
@@ -31,9 +26,9 @@ class UserDaoSlickImpl(db: Database)(implicit ec: ExecutionContext) {
     user.id match {
       case Some(userId) =>
         val updateUser = users
-            .filter(_.id === userId)
-            .map(u => (u.firstName, u.lastName, u.age))
-            .update((user.firstName, user.lastName, user.age))
+          .filter(_.id === userId)
+          .map(u => (u.firstName, u.lastName, u.age))
+          .update((user.firstName, user.lastName, user.age))
 
         val deleteRoles = usersToRoles.filter(_.usersId === userId).delete
         val insertRoles = usersToRoles ++= user.roles.map(userId -> _)
@@ -64,18 +59,17 @@ object UserDaoSlickImpl {
       case Role.Admin => "admin"
     },
     {
-        case "reader"  => Role.Reader
-        case "manager" => Role.Manager
-        case "admin"   => Role.Admin
+      case "reader"  => Role.Reader
+      case "manager" => Role.Manager
+      case "admin"   => Role.Admin
     }
   )
 
-
   case class UserRow(
-      id: Option[UUID],
-      firstName: String,
-      lastName: String,
-      age: Int
+    id: Option[UUID],
+    firstName: String,
+    lastName: String,
+    age: Int
   ) {
     def toUser(roles: Set[Role]): User = User(id, firstName, lastName, age, roles)
   }

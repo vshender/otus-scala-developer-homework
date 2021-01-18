@@ -1,27 +1,23 @@
-create extension if not exists "uuid-ossp";
+CREATE extension IF NOT EXISTS "uuid-ossp";
 
-create table roles (
-    code text primary key,
-    name text not null
+CREATE TABLE roles (
+    code text PRIMARY KEY,
+    name text NOT NULL
 );
 
-insert into roles(code, name)
-values ('reader', 'Reader'),
-('manager', 'Manager'),
-('admin', 'Admin')
-;
+INSERT INTO roles(code, name) VALUES
+       ('reader', 'Reader'),
+       ('manager', 'Manager'),
+       ('admin', 'Admin');
 
-create table users (
-    id uuid primary key default uuid_generate_v4(),
-    first_name text not null,
-    last_name text not null,
-    age integer not null
-)
-;
+CREATE TABLE users (
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    first_name text NOT NULL,
+    last_name text NOT NULL,
+    age integer NOT NULL
+);
 
-create table users_to_roles (
-    users_id uuid not null references users(id),
-    roles_code text not null references roles(code)
-)
-;
-
+CREATE TABLE users_to_roles (
+    users_id uuid NOT NULL REFERENCES users(id),
+    roles_code text NOT NULL REFERENCES roles(code)
+);
